@@ -15,7 +15,6 @@ const App = () => {
   const [playerId] = useState(() => Math.random().toString(36).substr(2, 9));
 
   useEffect(() => {
-    // Connect immediately when component mounts
     if (!socket.connected) {
       socket.connect();
     }

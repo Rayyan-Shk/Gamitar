@@ -54,7 +54,6 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
     });
     setViewingHistoricalState(true);
     
-    // Add console log for debugging
     console.log('Received historical state:', historical);
   } else {
     console.warn('Received invalid historical state:', historical);
@@ -62,7 +61,7 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
 });
 
     socket.on('playerCount', (count: number) => {
-      if (!viewingHistoricalState) {  // Only update player count when not viewing history
+      if (!viewingHistoricalState) {  //Only update player count when not viewing history
         setGridState(prev => ({ ...prev, onlinePlayers: count }));
       }
     });
@@ -95,7 +94,7 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
     }
   }, [timeLeft]);
 
-  // Check if enough time has passed since last update
+  //Check if enough time has passed since last update
   useEffect(() => {
     const now = Date.now();
     if (lastUpdateTime > 0 && now - lastUpdateTime < 60000) {
@@ -135,7 +134,7 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
 
   const handleHistorySelect = (timestamp: number) => {
     if (viewingHistoricalState && historicalState?.timestamp === timestamp) {
-      return; // Prevent requesting the same historical state
+      return; //Prevent requesting the same historical state
     }
     socket.emit('requestStateAtTimestamp', timestamp);
   };
@@ -153,7 +152,6 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
 
   const getCellColor = (value: string) => {
     if (!value) return 'bg-white hover:bg-gray-50';
-    // Generate a consistent color based on the character
     const colors = [
       'bg-blue-100 hover:bg-blue-200',
       'bg-green-100 hover:bg-green-200',
