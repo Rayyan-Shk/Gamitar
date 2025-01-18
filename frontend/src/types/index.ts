@@ -1,3 +1,5 @@
+import { Socket } from "socket.io-client";
+
 export interface GridCell {
   value: string;
   lastUpdated: number;
@@ -26,4 +28,9 @@ export interface HistoryEntry {
 
 export interface HistoricalState extends GridState {
   timestamp: number;
+}
+
+export interface GridProps {
+  socket: Socket;
+  playerId: string;
 }
