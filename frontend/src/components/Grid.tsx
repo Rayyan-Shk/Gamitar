@@ -171,85 +171,93 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          Gamitar
-        </h1>
-        <p className="text-gray-600 mt-2">Collaborate and create together!</p>
-      </div>
+    <div className="max-w-7xl mx-auto p-6">
+      <div className="flex items-start justify-between gap-8">
+        {/* Left side - Title and Description */}
+        <div className="w-1/4 sticky top-6">
+          <h1 className="text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight">
+            Gamitar
+          </h1>
+          <p className="text-gray-600 mt-4 text-xl">
+            Grid Multiplayer - Collaborate and create together!
+          </p>
+        </div>
 
-      <Card className="w-full bg-white shadow-xl">
-        <CardContent className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center space-x-2">
-              <Trophy className="text-yellow-500" />
-              <span className="text-lg font-semibold">
-                Players Online: {gridState.onlinePlayers}
-              </span>
-            </div>
-            {!canUpdate && timeLeft > 0 && (
-              <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full">
-                Next move in: {timeLeft}s
+        {/* Right side - Game Grid */}
+        <div className="w-3/4">
+          <Card className="w-full bg-white shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center space-x-2">
+                  <Trophy className="text-yellow-500" />
+                  <span className="text-lg font-semibold">
+                    Players Online: {gridState.onlinePlayers}
+                  </span>
+                </div>
+                {!canUpdate && timeLeft > 0 && (
+                  <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full">
+                    Next move in: {timeLeft}s
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  {viewingHistoricalState && (
+                    <Button 
+                      variant="outline"
+                      className="bg-purple-100 hover:bg-purple-200 text-purple-800"
+                      onClick={handleReturnToPresent}
+                    >
+                      Return to Present
+                    </Button>
+                  )}
+                  <HistoryPanel 
+                    history={history}
+                    onSelectTimestamp={handleHistorySelect}
+                  />
+                </div>
               </div>
-            )}
-            <div className="flex gap-2">
-              {viewingHistoricalState && (
-                <Button 
-                  variant="outline"
-                  className="bg-purple-100 hover:bg-purple-200 text-purple-800"
-                  onClick={handleReturnToPresent}
-                >
-                  Return to Present
-                </Button>
-              )}
-              <HistoryPanel 
-                history={history}
-                onSelectTimestamp={handleHistorySelect}
-              />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-10 gap-2 mb-6">
-            {gridState.cells.map((row, rowIndex) => (
-              row.map((cell, colIndex) => (
-                <Button
-                  key={`${rowIndex}-${colIndex}`}
-                  variant="outline"
-                  className={`w-12 h-12 text-xl font-bold transition-all duration-200 ${
-                    selectedCell?.row === rowIndex && selectedCell?.col === colIndex
-                      ? 'ring-2 ring-blue-500 shadow-lg'
-                      : ''
-                  } ${getCellColor(cell.value)}`}
-                  onClick={() => handleCellClick(rowIndex, colIndex)}
-                  disabled={!canUpdate || viewingHistoricalState || cell.value !== ''}
-                >
-                  {cell.value || ''}
-                </Button>
-              ))
-            ))}
-          </div>
+              
+              <div className="grid grid-cols-10 gap-2 mb-6">
+                {gridState.cells.map((row, rowIndex) => (
+                  row.map((cell, colIndex) => (
+                    <Button
+                      key={`${rowIndex}-${colIndex}`}
+                      variant="outline"
+                      className={`w-12 h-12 text-xl font-bold transition-all duration-200 ${
+                        selectedCell?.row === rowIndex && selectedCell?.col === colIndex
+                          ? 'ring-2 ring-blue-500 shadow-lg'
+                          : ''
+                      } ${getCellColor(cell.value)}`}
+                      onClick={() => handleCellClick(rowIndex, colIndex)}
+                      disabled={!canUpdate || viewingHistoricalState || cell.value !== ''}
+                    >
+                      {cell.value || ''}
+                    </Button>
+                  ))
+                ))}
+              </div>
 
-          {selectedCell && !viewingHistoricalState && (
-            <div className="flex gap-2 justify-center">
-              <Input
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value.toUpperCase())}
-                maxLength={1}
-                placeholder="Enter a character"
-                className="w-32 text-center text-xl"
-              />
-              <Button 
-                onClick={handleSubmit}
-                disabled={!inputValue}
-                className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-              >
-                Submit
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              {selectedCell && !viewingHistoricalState && (
+                <div className="flex gap-2 justify-center">
+                  <Input
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value.toUpperCase())}
+                    maxLength={1}
+                    placeholder="Enter a character"
+                    className="w-32 text-center text-xl"
+                  />
+                  <Button 
+                    onClick={handleSubmit}
+                    disabled={!inputValue}
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                  >
+                    Submit
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };
