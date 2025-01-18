@@ -23,12 +23,12 @@ Grid Multiplayer is a real-time collaborative web application where players can 
 - ✅ Historical view of all grid updates
 
 ### Technical Features
-- 🔄 Real-time synchronization using Socket.IO
-- 💾 Redis for state management
-- 🎨 Modern UI with shadcn/ui and Tailwind CSS
-- 📝 TypeScript implementation (frontend and backend)
-- 🧪 Comprehensive testing with Jest
-- 🔄 Continuous Integration pipeline
+-  Real-time synchronization using Socket.IO
+-  Redis for state management
+-  Modern UI with shadcn/ui and Tailwind CSS
+-  TypeScript implementation (frontend and backend)
+-  Comprehensive testing with Jest
+-  Continuous Integration pipeline
 
 ## Tech Stack
 
