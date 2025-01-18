@@ -1,19 +1,18 @@
 import { useState, useEffect } from 'react';
-import { Socket } from 'socket.io-client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { GridState, HistoryEntry, HistoricalState, GridProps } from '../types';
-import * as React from 'react'
+import * as React from 'react';
 import HistoryPanel from './HistoryPanel';
 import { Trophy } from 'lucide-react';
 
 const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
   const [gridState, setGridState] = useState<GridState>({
-    cells: Array(10).fill(null).map(() => 
+    cells: Array(10).fill(null).map(() =>
       Array(10).fill({ value: '', lastUpdated: 0, updatedBy: '' })
     ),
-    onlinePlayers: 1
+    onlinePlayers: 1,
   });
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null);
   const [inputValue, setInputValue] = useState('');
@@ -35,7 +34,7 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
       if (!viewingHistoricalState) {
         setGridState(prevState => ({
           ...newState,
-          onlinePlayers: prevState.onlinePlayers //Preserve player
+          onlinePlayers: prevState.onlinePlayers, // Preserve player
         }));
         setCurrentState(newState);
       }
@@ -50,7 +49,7 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
         setHistoricalState(historical);
         setGridState(prevState => ({
           cells: historical.cells,
-          onlinePlayers: prevState.onlinePlayers //preserve
+          onlinePlayers: prevState.onlinePlayers, // Preserve
         }));
         setViewingHistoricalState(true);
       }
@@ -73,7 +72,7 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
   useEffect(() => {
     if (timeLeft > 0) {
       const timer = setInterval(() => {
-        setTimeLeft((prev) => {
+        setTimeLeft(prev => {
           if (prev <= 1) {
             fetchPlayerCount();
             setCanUpdate(true);
@@ -95,12 +94,11 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      socket.emit('requestPlayerCount'); 
+      socket.emit('requestPlayerCount');
     } catch (error) {
       console.error('Error hitting the server:', error);
     }
   };
-
 
   useEffect(() => {
     const now = Date.now();
@@ -126,7 +124,7 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
       col: selectedCell.col,
       value: inputValue,
       playerId,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     socket.emit('updateCell', update);
@@ -149,7 +147,7 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
     if (currentState) {
       setGridState(prevState => ({
         ...currentState,
-        onlinePlayers: prevState.onlinePlayers //Preserve player count when returning to present
+        onlinePlayers: prevState.onlinePlayers, // Preserve player count when returning to present
       }));
     } else {
       socket.emit('requestInitialState');
@@ -171,37 +169,35 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="flex items-start justify-between gap-8">
-        {/* Left side - Title and Description */}
-        <div className="w-1/4 sticky top-6">
-          <h1 className="text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight">
+    <div className="max-w-7xl mx-auto">
+      <div className="flex flex-col lg:flex-row items-start justify-between gap-8">
+        <div className="w-full lg:w-1/4 sm:sticky md:sticky top-6">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight">
             Gamitar
           </h1>
-          <p className="text-gray-600 mt-4 text-xl">
+          <p className="text-gray-600 mt-4 text-lg md:text-xl">
             Grid Multiplayer - Collaborate and create together!
           </p>
         </div>
 
-        {/* Right side - Game Grid */}
-        <div className="w-3/4">
+        <div className="w-full lg:w-3/4">
           <Card className="w-full bg-white shadow-xl">
             <CardContent className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center space-x-2">
+              <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
+                <div className="flex items-center space-x-2 mb-4 sm:mb-0">
                   <Trophy className="text-yellow-500" />
                   <span className="text-lg font-semibold">
                     Players Online: {gridState.onlinePlayers}
                   </span>
                 </div>
                 {!canUpdate && timeLeft > 0 && (
-                  <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full">
+                  <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full mb-4 sm:mb-0">
                     Next move in: {timeLeft}s
                   </div>
                 )}
                 <div className="flex gap-2">
                   {viewingHistoricalState && (
-                    <Button 
+                    <Button
                       variant="outline"
                       className="bg-purple-100 hover:bg-purple-200 text-purple-800"
                       onClick={handleReturnToPresent}
@@ -209,20 +205,20 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
                       Return to Present
                     </Button>
                   )}
-                  <HistoryPanel 
+                  <HistoryPanel
                     history={history}
                     onSelectTimestamp={handleHistorySelect}
                   />
                 </div>
               </div>
-              
-              <div className="grid grid-cols-10 gap-2 mb-6">
-                {gridState.cells.map((row, rowIndex) => (
+
+              <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 mb-6">
+                {gridState.cells.map((row, rowIndex) =>
                   row.map((cell, colIndex) => (
                     <Button
                       key={`${rowIndex}-${colIndex}`}
                       variant="outline"
-                      className={`w-12 h-12 text-xl font-bold transition-all duration-200 ${
+                      className={`w-10 h-10 sm:w-12 sm:h-12 text-xl font-bold transition-all duration-200 ${
                         selectedCell?.row === rowIndex && selectedCell?.col === colIndex
                           ? 'ring-2 ring-blue-500 shadow-lg'
                           : ''
@@ -233,19 +229,19 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
                       {cell.value || ''}
                     </Button>
                   ))
-                ))}
+                )}
               </div>
 
               {selectedCell && !viewingHistoricalState && (
-                <div className="flex gap-2 justify-center">
+                <div className="flex flex-col sm:flex-row gap-2 justify-center">
                   <Input
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value.toUpperCase())}
                     maxLength={1}
                     placeholder="Enter a character"
-                    className="w-32 text-center text-xl"
+                    className="w-full sm:w-32 text-center text-xl"
                   />
-                  <Button 
+                  <Button
                     onClick={handleSubmit}
                     disabled={!inputValue}
                     className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
