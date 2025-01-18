@@ -110,7 +110,7 @@ npm start
 
 ## Continuous Integration
 
-This project uses GitHub Actions for CI. The pipeline includes:
+This project uses GitHub Actions for Continous Integration
 
 Check `.github/workflows` directory for CI configuration details.
 
