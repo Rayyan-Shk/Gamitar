@@ -1,11 +1,13 @@
 # Grid Multiplayer
 
-![Grid Multiplayer Screenshot 1](/frontend/public/Main.png)
-*Main game interface showing the 10x10 grid and online players*
-
 ## Overview
 
 Grid Multiplayer is a real-time collaborative web application where players can interact on a shared 10x10 grid. Players can place Unicode characters in grid blocks while seeing other players' updates in real-time.
+
+## Screenshots
+
+![Grid Multiplayer Screenshot 1](/frontend/public/Main.png)
+*Main game interface showing the 10x10 grid and online players*
 
 ![Grid Multiplayer Screenshot 2](/frontend/public/History.png)
 *Historical view showing previous grid states*
@@ -75,7 +77,7 @@ cd backend
 3. change env.example to .env
 ```bash
 cp .env.example .env
-# Edit .env file with your configurations
+# change env.example file to .env
 ```
 
 2. Run tests to ensure everything is working
@@ -98,7 +100,7 @@ cd frontend
 3. Set up environment variables
 ```bash
 cp .env.example .env
-# Edit .env file with your configurations
+# change env.example file to .env
 ```
 
 4. Start the frontend development server
