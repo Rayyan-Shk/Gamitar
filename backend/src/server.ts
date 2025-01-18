@@ -5,7 +5,7 @@ import cors from 'cors';
 import { RedisService, initRedis } from './services/redis'
 import { GridCell, GridState, HistoryEntry } from './types';
 
-const app = express();
+export const app = express();
 app.use(cors());
 
 const httpServer = createServer(app);
