@@ -3,19 +3,10 @@ import { Socket } from 'socket.io-client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { GridState, HistoryEntry } from '../types';
+import { GridState, HistoryEntry, HistoricalState, GridProps } from '../types';
 import * as React from 'react'
 import HistoryPanel from './HistoryPanel';
 import { Trophy } from 'lucide-react';
-
-interface GridProps {
-  socket: Socket;
-  playerId: string;
-}
-
-interface HistoricalState extends GridState {
-  timestamp: number
-}
 
 const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
   const [gridState, setGridState] = useState<GridState>({
@@ -79,20 +70,39 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
   }, [socket, viewingHistoricalState]);
 
   useEffect(() => {
-    if (timeLeft > 0) {
-      const timer = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            setCanUpdate(true);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+  if (timeLeft > 0) {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          // Trigger the API call when the countdown reaches 0
+          fetch(`${import.meta.env.VITE_BACKEND_URL}`, {
+            method: 'GET',
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              return response.json();
+            })
+            .then((data) => {
+              console.log('API response:', data);
+              // Optionally handle the data received from the server
+            })
+            .catch((error) => {
+              console.error('Error hitting the server:', error);
+            });
 
-      return () => clearInterval(timer);
-    }
-  }, [timeLeft]);
+          setCanUpdate(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }
+ }, [timeLeft]);
+
 
   //Check if enough time has passed since last update
   useEffect(() => {

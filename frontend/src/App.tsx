@@ -3,11 +3,11 @@ import { io } from 'socket.io-client';
 import Grid from './components/Grid';
 import * as React from 'react'
 
-const socket = io('http://localhost:3002', {
-  autoConnect: true, 
+const socket = io(import.meta.env.VITE_BACKEND_URL, {
+  autoConnect: true,
   reconnection: true,
   reconnectionAttempts: 5,
-  reconnectionDelay: 1000
+  reconnectionDelay: 1000,
 });
 
 const App = () => {
