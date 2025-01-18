@@ -25,86 +25,83 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
   const [lastUpdateTime, setLastUpdateTime] = useState<number>(0);
   const [historicalState, setHistoricalState] = useState<HistoricalState | null>(null);
 
+  //clean up
   useEffect(() => {
     socket.emit('requestInitialState');
     socket.emit('requestHistory');
+    socket.emit('requestPlayerCount');
 
-    socket.on('gridUpdate', (newState: GridState) => {
+    const handleGridUpdate = (newState: GridState) => {
       if (!viewingHistoricalState) {
-        setGridState(newState);
+        setGridState(prevState => ({
+          ...newState,
+          onlinePlayers: prevState.onlinePlayers //Preserve player
+        }));
         setCurrentState(newState);
       }
-    });
+    };
 
-    socket.on('historicalState', (historical: HistoricalState) => {
-  if (historical && historical.cells) {
-    setHistoricalState(historical);
-    setGridState({
-      cells: historical.cells,
-      onlinePlayers: historical.onlinePlayers || gridState.onlinePlayers
-    });
-    setViewingHistoricalState(true);
-    
-    console.log('Received historical state:', historical);
-  } else {
-    console.warn('Received invalid historical state:', historical);
-  }
-});
+    const handlePlayerCount = (count: number) => {
+      setGridState(prev => ({ ...prev, onlinePlayers: count }));
+    };
 
-    socket.on('playerCount', (count: number) => {
-      if (!viewingHistoricalState) {  //Only update player count when not viewing history
-        setGridState(prev => ({ ...prev, onlinePlayers: count }));
+    const handleHistoricalState = (historical: HistoricalState) => {
+      if (historical && historical.cells) {
+        setHistoricalState(historical);
+        setGridState(prevState => ({
+          cells: historical.cells,
+          onlinePlayers: prevState.onlinePlayers //preserve
+        }));
+        setViewingHistoricalState(true);
       }
-    });
+    };
 
-    socket.on('historicalUpdates', (updates: HistoryEntry[]) => {
-      setHistory(updates);
-    });
+    socket.on('gridUpdate', handleGridUpdate);
+    socket.on('historicalState', handleHistoricalState);
+    socket.on('playerCount', handlePlayerCount);
+    socket.on('historicalUpdates', setHistory);
 
     return () => {
-      socket.off('gridUpdate');
-      socket.off('historicalState');
-      socket.off('playerCount');
+      socket.off('gridUpdate', handleGridUpdate);
+      socket.off('historicalState', handleHistoricalState);
+      socket.off('playerCount', handlePlayerCount);
       socket.off('historicalUpdates');
     };
-  }, [socket, viewingHistoricalState]);
+  }, [socket]);
 
+  //effect for countdown timer and API call
   useEffect(() => {
-  if (timeLeft > 0) {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          // Trigger the API call when the countdown reaches 0
-          fetch(`${import.meta.env.VITE_BACKEND_URL}`, {
-            method: 'GET',
-          })
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-              }
-              return response.json();
-            })
-            .then((data) => {
-              console.log('API response:', data);
-              // Optionally handle the data received from the server
-            })
-            .catch((error) => {
-              console.error('Error hitting the server:', error);
-            });
+    if (timeLeft > 0) {
+      const timer = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            fetchPlayerCount();
+            setCanUpdate(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
 
-          setCanUpdate(true);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [timeLeft]);
 
-    return () => clearInterval(timer);
-  }
- }, [timeLeft]);
+  // Separate function for API call
+  const fetchPlayerCount = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      socket.emit('requestPlayerCount'); 
+    } catch (error) {
+      console.error('Error hitting the server:', error);
+    }
+  };
 
 
-  //Check if enough time has passed since last update
   useEffect(() => {
     const now = Date.now();
     if (lastUpdateTime > 0 && now - lastUpdateTime < 60000) {
@@ -114,8 +111,6 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
       setCanUpdate(true);
       setTimeLeft(0);
     }
-
-    socket.emit('requestPlayerCount');
   }, [lastUpdateTime]);
 
   const handleCellClick = (row: number, col: number) => {
@@ -144,16 +139,18 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
 
   const handleHistorySelect = (timestamp: number) => {
     if (viewingHistoricalState && historicalState?.timestamp === timestamp) {
-      return; //Prevent requesting the same historical state
+      return;
     }
     socket.emit('requestStateAtTimestamp', timestamp);
   };
 
-
-   const handleReturnToPresent = () => {
+  const handleReturnToPresent = () => {
     setHistoricalState(null);
     if (currentState) {
-      setGridState(currentState);
+      setGridState(prevState => ({
+        ...currentState,
+        onlinePlayers: prevState.onlinePlayers //Preserve player count when returning to present
+      }));
     } else {
       socket.emit('requestInitialState');
     }
@@ -177,7 +174,7 @@ const Grid: React.FC<GridProps> = ({ socket, playerId }) => {
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-        Gamitar
+          Gamitar
         </h1>
         <p className="text-gray-600 mt-2">Collaborate and create together!</p>
       </div>
