@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Redis from 'ioredis';
 import { io } from 'socket.io-client';
 
