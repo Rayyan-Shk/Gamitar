@@ -74,20 +74,20 @@ docker run --name redis -d -p 6379:6379 redis
 cd backend
 ```
 
-3. change env.example to .env
+2. change env.example to .env
 ```bash
 cp .env.example .env
 # change env.example file to .env
 ```
 
-2. Run tests to ensure everything is working
-```bash
-npm run test
-```
-
-5. Start the backend server
+3. Start the backend server
 ```bash
 npm start
+```
+
+4. Run tests to ensure everything is working
+```bash
+npm run test
 ```
 
 ### Frontend Setup
@@ -97,13 +97,13 @@ npm start
 cd frontend
 ```
 
-3. Set up environment variables
+2. Set up environment variables
 ```bash
 cp .env.example .env
 # change env.example file to .env
 ```
 
-4. Start the frontend development server
+3. Start the frontend development server
 ```bash
 npm start
 ```
